@@ -14,6 +14,23 @@ namespace FCamara.CommissionCalculator
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddCors(options =>
+            {
+                var CORS = builder?.Configuration?.GetSection("Cors")?.Get<List<string>>()?.ToArray();
+
+                options.AddDefaultPolicy(
+                   builder =>
+                   {
+                       if(CORS?.Length > 0)
+                       {
+                           builder.WithOrigins(CORS)
+                                .AllowAnyHeader()
+                                .AllowCredentials()
+                                .AllowAnyMethod();
+                       }
+                   });
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -23,10 +40,11 @@ namespace FCamara.CommissionCalculator
                 app.UseSwaggerUI();
             }
 
+            app.UseCors();
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
